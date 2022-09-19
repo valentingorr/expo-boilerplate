@@ -1,20 +1,63 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import React, {
+	useEffect,
+	useState
+} from "react";
 
-export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
-}
+import ContextProvider from "./context";
+import { createStore } from "redux";
+import {
+	Provider,
+	useSelector,
+	useDispatch
+} from "react-redux";
+import reducers from "./redux/reducers.js";
+import * as ACTIONS from "./redux/actions.js";
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+import { StatusBar } from "expo-status-bar";
+import { NavigationContainer } from "@react-navigation/native";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+
+import {
+	Platform,
+	SafeAreaView,
+	StyleSheet,
+	Text,
+	View
+} from "react-native";
+
+//import Screens
+import HomeScreen from "./screens/HomeScreen.js";
+
+const store = createStore(reducers);
+const Tab = createBottomTabNavigator();
+
+const App = props => {
+
+	const [user, setUser] = useState({ connected: false });
+	const [style, setStyle] = useState({
+		colors: {
+			primary: "#ffbbbb"
+		}
+	});
+
+	return (
+		<ContextProvider {...{user}}>
+			<StatusBar style="auto" backgroundColor="#f00"  barStyle="light-content" />
+			<SafeAreaView style={{ flex: 1, marginTop: StatusBar.currentHeight }}>
+				<NavigationContainer>
+					<Tab.Navigator>
+						<Tab.Screen name="home" component={HomeScreen} options={{ headerShown: false }} />
+					</Tab.Navigator>			
+				</NavigationContainer>
+			</SafeAreaView>
+		</ContextProvider>
+	);
+};
+
+export default props => {
+	return (
+		<Provider store={store}>
+			<App />
+		</Provider>
+	);
+};
